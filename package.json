@@ -1,0 +1,34 @@
+{
+  "name": "vim-import-cost",
+  "version": "0.0.1",
+  "description": "A plugin to display imports package size in Vim",
+  "keywords": [
+    "node",
+    "module",
+    "boilerplate"
+  ],
+  "license": "MIT",
+  "author": "Yarden Sod-Moriah <yardnsm@gmail.com> (yardnsm.net)",
+  "files": [
+    "dist"
+  ],
+  "main": "src/index.js",
+  "repository": "gitlab:yardnsm/vim-import-cost",
+  "scripts": {
+    "lint": "eslint . --ignore-path .gitignore",
+    "test": "npm run lint"
+  },
+  "dependencies": {
+    "get-stdin": "^6.0.0",
+    "import-cost": "^1.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "private": true
+}

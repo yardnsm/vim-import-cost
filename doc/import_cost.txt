@@ -1,0 +1,149 @@
+*import_cost.txt* Display import size for JavaScript packages
+
+           _                            _                      _   ~
+          (_)_ __ ___  _ __   ___  _ __| |_       ___ ___  ___| |_ ~
+          | | '_ ` _ \| '_ \ / _ \| '__| __|____ / __/ _ \/ __| __|~
+          | | | | | | | |_) | (_) | |  | ||_____| (_| (_) \__ \ |_ ~
+          |_|_| |_| |_| .__/ \___/|_|   \__|     \___\___/|___/\__|~
+                      |_|                                          ~
+
+         Displays the import size of the JavaScript packages you are
+                            importing inside Vim!
+
+==============================================================================
+CONTENTS                                                *import-cost-contents*
+
+    1. Intro ............................... |import-cost|
+    2. Installation ........................ |import-cost-install|
+    3. Commands............................. |import-cost-commands|
+    4. Configuration ....................... |import-cost-configuration|
+    5. License ............................. |import-cost-license|
+    6. Contributing ........................ |import-cost-contributing|
+    7. Credits ............................. |import-cost-credits|
+    8. Changelog ........................... |import-cost-changelog|
+
+==============================================================================
+INTRO                                                            *import-cost*
+
+This plugin is a (very rough) port of the "import-cost" plugin for Visual
+Studio Code. In a nutshell, it calculates the bundle size for each `import`
+or `require` statement. However, unlike the original plugin, this plugins does
+not show the calculated size as inline text. Instead, it exposes commands that
+allows you to calculate the package's size on demand.
+
+This plugin works for both JavaScript and TypeScript.
+
+==============================================================================
+INSTALLATION                                             *import-cost-install*
+
+You can use your typical plugin manager in order to install this plugin. Make
+sure you have `node` (>= 8) and `npm` installed, as it is required for this
+plugin to run.
+
+Run the following from the root path of the plugin (the same directory
+in which the file package.json is located): >
+
+    $ npm install
+<
+This will install the required dependencies for the plugin. You can utilize
+your plugin manager's post-hook feature for this (if it is available). See the
+examples below:
+
+* https://github.com/junegunn/vim-plug >
+
+    Plug 'yardnsm/vim-import-cost', { 'do': 'npm install' }
+<
+
+
+==============================================================================
+COMMANDS                                                *import-cost-commands*
+
+------------------------------------------------------------------------------
+:ImportCost                                                      *:ImportCost*
+
+Calculate the bundle size for each import in the opened buffer. If there are
+only 1 result, and |g:import_cost_always_open_split| is set to 0, the result
+will be shown below. Otherwise, a new split will be opened, containing the
+results for each import in the file.
+
+==============================================================================
+CONFIGURATION                                      *import-cost-configuration*
+
+You can configure the following settings to change how this plugin works.
+
+------------------------------------------------------------------------------
+g:import_cost_show_gzipped                        *g:import_cost_show_gzipped*
+
+When this option is on, the plugin will also display the gzipped size of the
+import. >
+
+    let g:import_cost_show_gzipped = 1
+<
+Value: 0 or 1
+Default: 1 (show gzipped size)
+
+------------------------------------------------------------------------------
+g:import_cost_always_open_split              *g:import_cost_always_open_split*
+
+When this option is on, the plugin will always open the output split, even if
+there is only one option: >
+
+    let g:import_cost_always_open_split = 1
+<
+Value: 0 or 1
+Default: 0 (only open split when there are more than 1 results)
+
+------------------------------------------------------------------------------
+g:import_cost_split_size                            *g:import_cost_split_size*
+
+This option controls the size of the output split. You can set this option to
+0 in order to split at the default value (50%): >
+
+    let g:import_cost_split_size = 0
+<
+Value: number
+Default: 50
+
+------------------------------------------------------------------------------
+g:import_cost_split_pos                              *g:import_cost_split_pos*
+
+This option controls where to open output window: >
+
+    let g:import_cost_split_pos = 'right'
+<
+Value: "left", "right"
+Default: "left"
+
+==============================================================================
+LICENSE                                                  *import-cost-license*
+
+The project is licensed under the MIT license. Copyright (c) 2018 Yarden
+Sod-Moriah.
+
+See: http://github.com/yardnsm/vim-import-cost/blob/master/LICENSE
+
+==============================================================================
+CONTRIBUTING                                        *import-cost-contributing*
+
+This project is hosted on GitHub. Feel free to submit issues, bug fixes and
+features!
+
+You can find the project page here:
+    http://github.com/yardnsm/vim-import-cost/
+
+==============================================================================
+CREDITS                                                  *import-cost-credits*
+
+The idea is heavily inspired by Wix's "import-cost" plugin. This plugin also
+utilize the "import-cost" pckage (also by Wix), to calcualte the bundle size
+for each import.
+
+See: https://github.com/wix/import-cost
+
+==============================================================================
+CHANGELOG                                              *import-cost-changelog*
+
+v1.0.0
+    * Initial stable release.
+
+ vim:tw=78:sw=4:ft=help:norl:
