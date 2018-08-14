@@ -1,3 +1,4 @@
+
 " Initial checks {{{
 
 if exists('g:loaded_import_cost') || &compatible
