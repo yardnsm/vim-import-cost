@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/yardnsm/vim-import-cost.svg?branch=master)](https://travis-ci.org/yardnsm/vim-import-cost)
 
+![](media/screenshot.png)
+
 This plugin is a (very rough) port of the [import-cost](https://github.com/wix/import-cost) plugin
 for Visual Studio Code. In a nutshell, it calculates the bundle size for each `import` or `require`
 statement. However, unlike the original plugin, this plugins does not show the calculated size as

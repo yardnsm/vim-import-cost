@@ -1,3 +1,9 @@
+" ============================================================================
+" File:        import_cost.vim
+" Author:      Yarden Sod-Moriah
+" Description: Display import size for JavaScript packages
+" License:     MIT
+" ============================================================================
 
 " Initial checks {{{
 

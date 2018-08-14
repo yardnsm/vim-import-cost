@@ -1,4 +1,3 @@
-
 let s:plug = expand("<sfile>:p:h:h")
 let s:script_path = s:plug . '/src/index.js'
 
