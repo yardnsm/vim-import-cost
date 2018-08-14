@@ -2,11 +2,6 @@
   "name": "vim-import-cost",
   "version": "0.0.1",
   "description": "A plugin to display imports package size in Vim",
-  "keywords": [
-    "node",
-    "module",
-    "boilerplate"
-  ],
   "license": "MIT",
   "author": "Yarden Sod-Moriah <yardnsm@gmail.com> (yardnsm.net)",
   "files": [

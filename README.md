@@ -33,7 +33,7 @@ the plugin directory, so the required dependencies will be installed.
 
 ## Usage
 
-Use the `:ImportCost` plugin when inside a JavaScript / TypeScript buffer.
+Use the `:ImportCost` command when inside a JavaScript / TypeScript buffer.
 
 ## Configuration
 

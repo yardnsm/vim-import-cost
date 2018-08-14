@@ -135,7 +135,7 @@ You can find the project page here:
 CREDITS                                                  *import-cost-credits*
 
 The idea is heavily inspired by Wix's "import-cost" plugin. This plugin also
-utilize the "import-cost" pckage (also by Wix), to calcualte the bundle size
+utilize the "import-cost" package (also by Wix), to calculate the bundle size
 for each import.
 
 See: https://github.com/wix/import-cost
