@@ -54,7 +54,6 @@ examples below:
     Plug 'yardnsm/vim-import-cost', { 'do': 'npm install' }
 <
 
-
 ==============================================================================
 COMMANDS                                                *import-cost-commands*
 
@@ -65,6 +64,15 @@ Calculate the bundle size for each import in the opened buffer. If there are
 only 1 result, and |g:import_cost_always_open_split| is set to 0, the result
 will be shown below. Otherwise, a new split will be opened, containing the
 results for each import in the file.
+
+This command support line ranges.
+
+------------------------------------------------------------------------------
+:ImportCostSingle                                          *:ImportCostSingle*
+
+Calculate the bundle size for the current line only. If
+|g:import_cost_always_open_split| is set to 1, a new split will be opened,
+containing the result. Otherwise, the result will be shown below.
 
 ==============================================================================
 CONFIGURATION                                      *import-cost-configuration*

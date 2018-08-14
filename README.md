@@ -22,7 +22,7 @@ post](https://hackernoon.com/keep-your-bundle-size-under-control-with-import-cos
 Use you favorite plugin manager to install this plugin. Make sure to have `node` (>= 8) and `npm`
 installed.
 
-Using [vim-plug](https://github.com/junegunn/vim-plug):
+### Using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
 Plug 'yardnsm/vim-import-cost', { 'do': 'npm install' }
@@ -33,7 +33,10 @@ the plugin directory, so the required dependencies will be installed.
 
 ## Usage
 
-Use the `:ImportCost` command when inside a JavaScript / TypeScript buffer.
+Use the `:ImportCost` command when inside a JavaScript / TypeScript buffer. This commands also
+support ranges, so you can initiate it from VISUAL mode.
+
+Use the `:ImportCostSingle` command if you wish to process the current line only.
 
 ## Configuration
 

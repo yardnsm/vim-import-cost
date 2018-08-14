@@ -36,7 +36,8 @@ call s:InitSettings(s:default_settings)
 " Commands {{{
 
 function! s:InitCommands()
-  command! -buffer ImportCost try | call import_cost#ShowImportCostForCurrentBuffer() | endtry
+  command! -buffer -range=0 ImportCost call import_cost#ImportCost(<count>, <line1>, <line2>)
+  command! -buffer          ImportCostSingle call import_cost#ImportCost(1, <line1>, <line1>)
 endfunction
 
 " }}}
