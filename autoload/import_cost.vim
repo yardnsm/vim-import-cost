@@ -25,7 +25,15 @@ endfunction
 
 " Pretty format a size in bytes
 function! s:PrettyFormatSize(size)
-  return string(a:size / 1024) . ' KB'
+  let l:pretty_size = a:size / 1000.0
+  let l:unit = 'KB'
+
+  if l:pretty_size >= 1000
+    let l:pretty_size = l:pretty_size / 1000
+    let l:unit = 'MB'
+  endif
+
+  return printf('%.0f', l:pretty_size) . l:unit
 endfunction
 
 " }}}
@@ -140,7 +148,7 @@ function! s:CreateImportString(import)
   let l:raw_size = s:PrettyFormatSize(a:import['size'])
   let l:gzipped_size = s:PrettyFormatSize(a:import['gzip'])
 
-  let l:str = ':' . a:import['name'] . ': ' . l:raw_size
+  let l:str = a:import['name'] . ': ' . l:raw_size
 
   if g:import_cost_show_gzipped == 1
     let l:str .= ' (gzipped: ' . l:gzipped_size . ')'
