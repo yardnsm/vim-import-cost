@@ -91,7 +91,7 @@ function! s:CreateScratchBuffer()
   end
 
   " Clear contents
-  normal! ggdG
+  normal! gg"_dG
 
   setlocal filetype=importcost
   setlocal buftype=nofile
