@@ -11,7 +11,11 @@ let s:scrollbind_backup = 0
 let s:import_cost_stdout = ''
 let s:import_cost_stderr = ''
 
+" Current running async job
 let s:import_cost_job_id = 0
+
+" The staring line of a range
+let s:range_start_line = 0
 
 " Reset buffer sync after quitting
 augroup import_cost_scratch_buffer
@@ -40,6 +44,13 @@ function! s:PrettyFormatSize(size)
   endif
 
   return printf('%.0f', l:pretty_size) . l:unit
+endfunction
+
+" }}}
+" Async utilities {{{
+
+function! s:IsAsyncSupported()
+  return has('nvim') || v:version > 800
 endfunction
 
 " }}}
@@ -276,11 +287,10 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
   let l:buffer_content = bufnr('%')
   let s:buffer_lines = line('$')
 
-  let s:range_start_line = 0
-
   " Reset previous results
   let s:import_cost_stdout = ''
   let s:import_cost_stderr = ''
+  let s:range_start_line = 0
 
   if a:ranged
 
@@ -289,8 +299,11 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
     let s:range_start_line = a:line_1 - 1
   endif
 
-  call s:ExecuteImportCostAsync(l:file_type, l:file_path, l:buffer_content)
-  return
+  if s:IsAsyncSupported() && !g:import_cost_disable_async
+    call s:ExecuteImportCostAsync(l:file_type, l:file_path, l:buffer_content)
+  else
+    call s:ExecuteImportCostSync(l:file_type, l:file_path, l:buffer_content)
+  endif
 endfunction
 
 " }}}
