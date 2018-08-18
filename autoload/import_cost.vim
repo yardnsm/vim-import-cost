@@ -3,8 +3,15 @@ let s:script_path = s:plug . '/src/index.js'
 
 let s:scratch_buffer_name = '__Import_Cost__'
 
+" Keeping the previous state of these options for resetting the buffer syncing
 let s:cursorbind_backup = 0
 let s:scrollbind_backup = 0
+
+" Outputs of the import cost script
+let s:import_cost_stdout = ''
+let s:import_cost_stderr = ''
+
+let s:import_cost_job_id = 0
 
 " Reset buffer sync after quitting
 augroup import_cost_scratch_buffer
@@ -39,7 +46,7 @@ endfunction
 " Buffer syncing {{{
 
 " Enable buffer sync (cursorbind and scrollbind essentially)
-function! s:EnableBufferSync()
+function! s:EnableBufferSyncForCurrentBuffer()
   let s:cursorbind_backup = &l:cursorbind
   let s:scrollbind_backup = &l:scrollbind
 
@@ -72,7 +79,7 @@ endfunction
 function! s:CreateScratchBuffer()
 
   " Bind cursor and scrolling
-  call s:EnableBufferSync()
+  call s:EnableBufferSyncForCurrentBuffer()
 
   " Check if the split is already open
   let win = bufwinnr('^' . s:scratch_buffer_name . '$')
@@ -90,6 +97,10 @@ function! s:CreateScratchBuffer()
     endif
   end
 
+  " 'Unlock' the buffer
+  set noreadonly
+  set modifiable
+
   " Clear contents
   normal! gg"_dG
 
@@ -106,6 +117,7 @@ endfunction
 " Fill the scratch buffer with imports
 " Asumming we're in the scratch buffer...
 function! s:FillScratchBuffer(imports, start_line, num_lines)
+
   " Appending empty lines to the buffer
   call append(0, map(range(a:num_lines), '""'))
 
@@ -116,6 +128,10 @@ function! s:FillScratchBuffer(imports, start_line, num_lines)
 
   " Clear extra blank lines
   silent! %substitute#\($\n\)\+\%$##
+
+  " 'Lock' the buffer
+  set readonly
+  set nomodifiable
 endfunction
 
 " }}}
@@ -156,22 +172,98 @@ function! s:CreateImportString(import)
   return l:str
 endfunction
 
-" Execute the import-cost script on a given content
-" - If `file_contents` is a buffer number, that buffer contents will be taken
-" - Returns a list if the command was successful, and a string if there was an error
-function! s:ExecuteImportCost(file_type, file_path, file_contents)
+" Async job callback
+function! s:OnEvent(job_id, data, event) dict
+  if a:event == 'stdout'
+    let s:import_cost_stdout .= join(a:data)
+  elseif a:event == 'stderr'
+    if join(a:data) =~ '\v^\[error\]'
+      let s:import_cost_stderr .= join(a:data)
+    endif
+  else
+    call s:OnScriptFinish()
+  endif
+endfunction
+
+function! s:OnScriptFinish()
+
+  " Check for errors
+  if len(s:import_cost_stderr)
+    call s:EchoError(s:import_cost_stderr)
+    return
+  endif
+
+  " If we got nothing, do nothing
+  if !len(s:import_cost_stdout)
+    return
+  endif
+
+  let l:imports = map(split(s:import_cost_stdout, ' '), function('s:ParseSingleImport'))
+  call filter(l:imports, 'len(v:val)')
+
+  let l:imports_length = len(l:imports)
+
+  " If we've got a single import, echo it instead of creating a new scratch
+  " buffer (if needed)
+  if l:imports_length == 1 && g:import_cost_always_open_split != 1
+    echom s:CreateImportString(l:imports[0])
+    return
+  endif
+
+  echo 'Got ' . l:imports_length . ' results.'
+
+  " Create a new scratch buffer and fill it
+  " Keep the focus on the currently opened buffer
+  if l:imports_length > 0
+    let l:current_buffer_name = bufname('.')
+    normal m'
+
+    call s:CreateScratchBuffer()
+    call s:FillScratchBuffer(l:imports, s:range_start_line, s:buffer_lines)
+
+    execute bufwinnr(l:current_buffer_name) . 'wincmd w'
+    normal ''
+  endif
+endfunction
+
+let s:callbacks = {
+      \ 'on_stdout': function('s:OnEvent'),
+      \ 'on_stderr': function('s:OnEvent'),
+      \ 'on_exit': function('s:OnEvent')
+      \ }
+
+function! s:ExecuteImportCostAsync(file_type, file_path, file_contents)
+  let l:command_args = ['node', s:script_path, a:file_type, a:file_path]
+
+  " Kill last job
+  silent! call jobstop(s:import_cost_job_id)
+
+  " Start the job
+  let s:import_cost_job_id = jobstart(l:command_args, extend({'shell': 'import_cost_shell'}, s:callbacks))
+
+  " Send the file contents and close the stdin channel
+  call chansend(s:import_cost_job_id, a:file_contents)
+  call chanclose(s:import_cost_job_id, 'stdin')
+endfunction
+
+function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
+
+  echo 'Calculating... (press ^C to terminate)'
+
   let l:command = join(['node', s:script_path, a:file_type, a:file_path], ' ')
   let l:result = system(l:command, a:file_contents)
 
   " Check for errors
   if l:result =~ '\v^\[error\]'
-    return l:result
+    let s:import_cost_stderr = l:result
+  else
+    let s:import_cost_stdout = join(split(l:result, '\n'), ' ')
   endif
 
-  let l:imports = map(split(l:result, '\n'), function('s:ParseSingleImport'))
-  call filter(l:imports, 'len(v:val)')
+  " Clear last message
+  redraw
 
-  return l:imports
+  call s:OnScriptFinish()
 endfunction
 
 " }}}
@@ -182,49 +274,23 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
   let l:file_path = expand("%:p")
 
   let l:buffer_content = bufnr('%')
-  let l:buffer_lines = line('$')
+  let s:buffer_lines = line('$')
 
-  let l:range_start_line = 0
+  let s:range_start_line = 0
 
-  echo 'Calculating... (press ^C to terminate)'
+  " Reset previous results
+  let s:import_cost_stdout = ''
+  let s:import_cost_stderr = ''
 
   if a:ranged
 
     " Get selected lines
     let l:buffer_content = join(getline(a:line_1, a:line_2), "\n")
-    let l:range_start_line = a:line_1 - 1
+    let s:range_start_line = a:line_1 - 1
   endif
 
-  let l:imports = s:ExecuteImportCost(l:file_type, l:file_path, l:buffer_content)
-  let l:imports_length = len(l:imports)
-
-  " If we got a string, it should be an error
-  if type(l:imports) == 1
-    call s:EchoError(l:imports)
-    return
-  endif
-
-  " Clear previous messages
-  redraw
-
-  " If we've got a single import, echo it instead of creating a new scratch
-  " buffer (if needed)
-  if l:imports_length == 1 && g:import_cost_always_open_split != 1
-    echom s:CreateImportString(l:imports[0])
-    return
-  endif
-
-  echo 'Got ' . len(l:imports) . ' results.'
-
-  " Create a new scratch buffer and fill it
-  if l:imports_length > 0
-    call s:CreateScratchBuffer()
-    call s:FillScratchBuffer(l:imports, l:range_start_line, l:buffer_lines)
-  endif
-endfunction
-
-" Execute the script for the enite buffer
-function! import_cost#ShowImportCostForCurrentBuffer()
+  call s:ExecuteImportCostAsync(l:file_type, l:file_path, l:buffer_content)
+  return
 endfunction
 
 " }}}
