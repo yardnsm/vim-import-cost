@@ -101,6 +101,7 @@ function! s:CreateScratchBuffer()
 
   " Fast quitting
   nnoremap <buffer> <silent> q :<C-U>bdelete<CR>
+  nnoremap <buffer> <silent> s :<C-U>echom b:total_string<CR>
 endfunction
 
 " Fill the scratch buffer with imports
@@ -154,6 +155,20 @@ function! s:CreateImportString(import)
   endif
 
   return l:str
+endfunction
+
+function! s:CreateTotalString(imports)
+  let l:size = 0
+  let l:gzip = 0
+  for import in a:imports
+    let l:size = l:size + import['size']
+    let l:gzip = l:gzip + import['gzip']
+  endfor
+  return s:CreateImportString({
+  \ 'name': 'Total size',
+  \ 'size': l:size,
+  \ 'gzip': l:gzip,
+  \ })
 endfunction
 
 " Execute the import-cost script on a given content
@@ -214,12 +229,16 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
     return
   endif
 
-  echo 'Got ' . len(l:imports) . ' results.'
-
   " Create a new scratch buffer and fill it
   if l:imports_length > 0
+    let l:total_string = s:CreateTotalString(l:imports)
+    echo 'Got ' . l:imports_length . ' results. ' . l:total_string
     call s:CreateScratchBuffer()
+    " Make the total string available to the total size mapping
+    let b:total_string = l:total_string
     call s:FillScratchBuffer(l:imports, l:range_start_line, l:buffer_lines)
+  else
+    echo 'Got 0 results.'
   endif
 endfunction
 

@@ -16,11 +16,12 @@ CONTENTS                                                *import-cost-contents*
     1. Intro ............................... |import-cost|
     2. Installation ........................ |import-cost-install|
     3. Commands............................. |import-cost-commands|
-    4. Configuration ....................... |import-cost-configuration|
-    5. License ............................. |import-cost-license|
-    6. Contributing ........................ |import-cost-contributing|
-    7. Credits ............................. |import-cost-credits|
-    8. Changelog ........................... |import-cost-changelog|
+    4. Mappings............................. |import-cost-mappings|
+    5. Configuration ....................... |import-cost-configuration|
+    6. License ............................. |import-cost-license|
+    7. Contributing ........................ |import-cost-contributing|
+    8. Credits ............................. |import-cost-credits|
+    9. Changelog ........................... |import-cost-changelog|
 
 ==============================================================================
 INTRO                                                            *import-cost*
@@ -73,6 +74,16 @@ This command support line ranges.
 Calculate the bundle size for the current line only. If
 |g:import_cost_always_open_split| is set to 1, a new split will be opened,
 containing the result. Otherwise, the result will be shown below.
+
+==============================================================================
+MAPPINGS                                                *import-cost-mappings*
+
+These mappings are available in the split showing the import sizes.
+
+------------------------------------------------------------------------------
+Show total import size                                *import-cost-total-size*
+Bound to: s
+Shows the total size of all calculated imports in the buffer (or range)
 
 ==============================================================================
 CONFIGURATION                                      *import-cost-configuration*
