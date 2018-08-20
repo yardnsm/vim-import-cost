@@ -47,77 +47,6 @@ function! s:PrettyFormatSize(size)
 endfunction
 
 " }}}
-" Async support {{{
-
-" Most of following functions assumes that the check for async support
-" (`s:IsAsyncSupported()`) was done before.
-
-" Check wether the current version of the editor supports async jobs
-function! s:IsAsyncSupported()
-  return has('nvim') || v:version >= 800
-endfunction
-
-" Start a new async job
-" The callback function should have the following signature:
-"
-"     `function! JobCallback(data, event)`
-"
-" Where `data` is a string containing the data received, and `event` is the
-" event type (can be one of `stdin`, `stderr`, `exit`). The `data` for the
-" `exit` event is the exit code.
-"
-function! s:AsyncJobStart(command, callback)
-  if has('nvim')
-    let l:TransformedCallback = {job_id, data, event ->
-          \ a:callback(type(data) == 3 ? join(data, "\n") : data, event)}
-
-    let l:job_id = jobstart(a:command, {
-          \ 'shell': 'import_cost_shell',
-          \ 'on_stdout': l:TransformedCallback,
-          \ 'on_stderr': l:TransformedCallback,
-          \ 'on_exit': l:TransformedCallback,
-          \ })
-  else
-    let l:job_id = job_start(a:command, {
-          \ 'callback': {channel, data -> a:callback(data, 'stdout')},
-          \ 'err_cb': {channel, data -> a:callback(data, 'stderr')},
-          \ 'exit_cb': {job_id, exit_code -> a:callback(exit_code, 'exit')},
-          \ 'mode': 'raw',
-          \ })
-    echom job_status(l:job_id)
-  endif
-
-  return l:job_id
-endfunction
-
-" Stops a job
-function! s:AsyncJobStop(job_id)
-  if has('nvim')
-    call jobstop(a:job_id)
-  else
-    call job_stop(a:job_id)
-  endif
-endfunction
-
-" Send an input to a job via stdin
-function! s:AsyncJobSend(job_id, data)
-  if has('nvim')
-    call chansend(a:job_id, a:data)
-  else
-    call ch_sendraw(job_getchannel(a:job_id), a:data)
-  endif
-endfunction
-
-" Close the stdin channel for a job
-function! s:AsyncJobClose(job_id)
-  if has('nvim')
-    call chanclose(a:job_id, 'stdin')
-  else
-    call ch_close_in(job_getchannel(a:job_id))
-  endif
-endfunction
-
-" }}}
 " Buffer syncing {{{
 
 " Enable buffer sync (cursorbind and scrollbind essentially)
@@ -247,19 +176,6 @@ function! s:CreateImportString(import)
   return l:str
 endfunction
 
-" Async job callback
-function! s:AsyncJobCallback(data, event)
-  if a:event == 'stdout'
-    let s:import_cost_stdout .= a:data
-  elseif a:event == 'stderr'
-    if a:data =~ '\v^\[error\]'
-      let s:import_cost_stderr .= a:data
-    endif
-  else
-    call s:OnScriptFinish()
-  endif
-endfunction
-
 function! s:OnScriptFinish()
 
   " Check for errors
@@ -304,19 +220,31 @@ endfunction
 " }}}
 " Main functionality {{{
 
+" Async job callback
+function! s:AsyncJobCallback(data, event)
+  if a:event ==# 'stdout'
+    let s:import_cost_stdout .= a:data
+  elseif a:event ==# 'stderr' && a:data =~# '\v^\[error\]'
+    let s:import_cost_stderr .= a:data
+  elseif a:event ==# 'exit'
+    call s:OnScriptFinish()
+  endif
+endfunction
+
 " Execute the script asynchronously
 function! s:ExecuteImportCostAsync(file_type, file_path, file_contents)
   let l:command = ['node', s:script_path, a:file_type, a:file_path]
 
   " Kill last job
-  silent! call s:AsyncJobStop(s:import_cost_job_id)
+  silent! call import_cost#async#job_stop(s:import_cost_job_id)
 
   " Start the job
-  let s:import_cost_job_id = s:AsyncJobStart(l:command, function('s:AsyncJobCallback'))
+  let s:import_cost_job_id = import_cost#async#job_start(l:command,
+        \ function('s:AsyncJobCallback'))
 
   " Send the file contents and close the stdin channel
-  call s:AsyncJobSend(s:import_cost_job_id, a:file_contents)
-  call s:AsyncJobClose(s:import_cost_job_id)
+  call import_cost#async#job_send(s:import_cost_job_id, a:file_contents)
+  call import_cost#async#job_close(s:import_cost_job_id)
 endfunction
 
 " Execute the script synchronously
@@ -358,10 +286,10 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
     let l:buffer_content = join(getline(a:line_1, a:line_2), "\n")
     let s:range_start_line = a:line_1 - 1
   else
-    let l:buffer_content = join(getline(0, s:buffer_lines), "\n")
+    let l:buffer_content = join(getline(1, '$'), "\n")
   endif
 
-  if s:IsAsyncSupported() && !g:import_cost_disable_async
+  if import_cost#async#is_supported() && !g:import_cost_disable_async
     call s:ExecuteImportCostAsync(l:file_type, l:file_path, l:buffer_content)
   else
     call s:ExecuteImportCostSync(l:file_type, l:file_path, l:buffer_content)
