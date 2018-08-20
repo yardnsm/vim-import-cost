@@ -116,6 +116,7 @@ function! s:CreateScratchBuffer()
 
   " Fast quitting
   nnoremap <buffer> <silent> q :<C-U>bdelete<CR>
+  nnoremap <buffer> <silent> s :<C-U>echom b:total_string<CR>
 endfunction
 
 " Fill the scratch buffer with imports
@@ -176,6 +177,20 @@ function! s:CreateImportString(import)
   return l:str
 endfunction
 
+function! s:CreateTotalString(imports)
+  let l:size = 0
+  let l:gzip = 0
+  for import in a:imports
+    let l:size = l:size + import['size']
+    let l:gzip = l:gzip + import['gzip']
+  endfor
+  return s:CreateImportString({
+  \ 'name': 'Total size',
+  \ 'size': l:size,
+  \ 'gzip': l:gzip,
+  \ })
+endfunction
+
 function! s:OnScriptFinish()
 
   " Check for errors
@@ -193,6 +208,7 @@ function! s:OnScriptFinish()
   call filter(l:imports, 'len(v:val)')
 
   let l:imports_length = len(l:imports)
+  let l:result_message = 'Got ' . l:imports_length . ' results.'
 
   " If we've got a single import, echo it instead of creating a new scratch
   " buffer (if needed)
@@ -201,20 +217,24 @@ function! s:OnScriptFinish()
     return
   endif
 
-  echo 'Got ' . l:imports_length . ' results.'
-
   " Create a new scratch buffer and fill it
   " Keep the focus on the currently opened buffer
   if l:imports_length > 0
     let l:current_buffer_name = bufname('.')
     normal m'
-
+    
     call s:CreateScratchBuffer()
     call s:FillScratchBuffer(l:imports, s:range_start_line, s:buffer_lines)
+    
+    " We'll keep the total size string within the scratch buffer
+    let b:total_size_string = s:CreateTotalString(l:imports)
+    let l:result_message .= ' ' . b:total_size_string
 
     execute bufwinnr(l:current_buffer_name) . 'wincmd w'
     normal ''
   endif
+  
+  echom l:results_message
 endfunction
 
 " }}}
