@@ -116,7 +116,9 @@ function! s:CreateScratchBuffer()
 
   " Fast quitting
   nnoremap <buffer> <silent> q :<C-U>bdelete<CR>
-  nnoremap <buffer> <silent> s :<C-U>echom b:total_string<CR>
+
+  " Show total size
+  nnoremap <buffer> <silent> s :<C-U>echom b:total_size_string<CR>
 endfunction
 
 " Fill the scratch buffer with imports
@@ -177,18 +179,22 @@ function! s:CreateImportString(import)
   return l:str
 endfunction
 
-function! s:CreateTotalString(imports)
+" This function takes the imports data and returns a string containing data
+" about the total size
+function! s:CreateTotalSizeString(imports)
   let l:size = 0
   let l:gzip = 0
+
   for import in a:imports
     let l:size = l:size + import['size']
     let l:gzip = l:gzip + import['gzip']
   endfor
+
   return s:CreateImportString({
-  \ 'name': 'Total size',
-  \ 'size': l:size,
-  \ 'gzip': l:gzip,
-  \ })
+        \ 'name': 'Total size',
+        \ 'size': l:size,
+        \ 'gzip': l:gzip,
+        \ })
 endfunction
 
 function! s:OnScriptFinish()
@@ -222,19 +228,19 @@ function! s:OnScriptFinish()
   if l:imports_length > 0
     let l:current_buffer_name = bufname('.')
     normal m'
-    
+
     call s:CreateScratchBuffer()
     call s:FillScratchBuffer(l:imports, s:range_start_line, s:buffer_lines)
-    
+
     " We'll keep the total size string within the scratch buffer
-    let b:total_size_string = s:CreateTotalString(l:imports)
+    let b:total_size_string = s:CreateTotalSizeString(l:imports)
     let l:result_message .= ' ' . b:total_size_string
 
     execute bufwinnr(l:current_buffer_name) . 'wincmd w'
     normal ''
   endif
-  
-  echom l:results_message
+
+  echom l:result_message
 endfunction
 
 " }}}
