@@ -57,7 +57,7 @@ endfunction
 " Send an input to a job via stdin
 function! import_cost#async#job_send(job_id, data)
   if has('nvim')
-    call chansend(a:job_id, a:data)
+    call jobsend(a:job_id, a:data)
   else
     call ch_sendraw(job_getchannel(a:job_id), a:data)
   endif
@@ -66,7 +66,7 @@ endfunction
 " Close the stdin channel for a job
 function! import_cost#async#job_close(job_id)
   if has('nvim')
-    call chanclose(a:job_id, 'stdin')
+    call jobclose(a:job_id, 'stdin')
   else
     call ch_close_in(job_getchannel(a:job_id))
   endif
