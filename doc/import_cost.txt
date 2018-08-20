@@ -110,7 +110,7 @@ there is only one option: >
     let g:import_cost_always_open_split = 1
 <
 Value: 0 or 1
-Default: 0 (only open split when there are more than 1 results)
+Default: 1 (always open a split)
 
 ------------------------------------------------------------------------------
 g:import_cost_split_size                            *g:import_cost_split_size*
@@ -132,6 +132,21 @@ This option controls where to open output window: >
 <
 Value: "left", "right"
 Default: "left"
+
+------------------------------------------------------------------------------
+g:import_cost_disable_async                      *g:import_cost_disable_async*
+
+When this option is on, the imports size calculation will be run
+synchronously. This is not recommended, as it will cause the UI to block until
+the execution is complete.
+
+If you are running a version without asynchronous capabilities, this option is
+enabled by default. >
+
+    let g:import_cost_disable_async = 1
+<
+Value: 0 or 1
+Default: 0 (use asynchronous execution)
 
 ==============================================================================
 LICENSE                                                  *import-cost-license*

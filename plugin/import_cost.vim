@@ -31,9 +31,10 @@ endfunction
 
 let s:default_settings = {
   \ 'show_gzipped': 1,
-  \ 'always_open_split': 0,
+  \ 'always_open_split': 1,
   \ 'split_size': 50,
   \ 'split_pos': 'left',
+  \ 'disable_async': 0,
   \ }
 
 call s:InitSettings(s:default_settings)
