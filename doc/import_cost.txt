@@ -82,8 +82,18 @@ These mappings are available in the split showing the import sizes.
 
 ------------------------------------------------------------------------------
 Show total import size                                *import-cost-total-size*
+
 Bound to: s
-Shows the total size of all calculated imports in the buffer (or range)
+
+Shows the total size of all calculated imports in the results buffer (or
+range).
+
+------------------------------------------------------------------------------
+Quit                                                  *import-cost-total-size*
+
+Bound to: q
+
+Closes the results buffer.
 
 ==============================================================================
 CONFIGURATION                                      *import-cost-configuration*
