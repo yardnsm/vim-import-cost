@@ -89,7 +89,7 @@ Shows the total size of all calculated imports in the results buffer (or
 range).
 
 ------------------------------------------------------------------------------
-Quit                                                  *import-cost-total-size*
+Quit                                                        *import-cost-quit*
 
 Bound to: q
 
