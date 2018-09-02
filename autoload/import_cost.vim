@@ -17,11 +17,19 @@ let s:import_cost_job_id = 0
 " The staring line of a range
 let s:range_start_line = 0
 
-" Reset buffer sync after quitting
+" Is the scratch buffer open?
+let s:scratch_buffer_open = 0
+
 augroup import_cost_scratch_buffer
   autocmd!
 
-  autocmd BufWinLeave __Import_Cost__ call s:ResetBufferSync()
+  " Reset buffer sync after quitting
+  autocmd BufWinLeave __Import_Cost__ call s:ResetBufferSyncForAllBuffers()
+  autocmd BufWinEnter *               call s:ResetBufferSyncForCurrentBuffer()
+
+  " Set open state
+  autocmd BufWinEnter __Import_Cost__ let s:scratch_buffer_open = 1
+  autocmd BufWinLeave __Import_Cost__ let s:scratch_buffer_open = 0
 augroup END
 
 " Utility functions {{{
@@ -60,8 +68,16 @@ function! s:EnableBufferSyncForCurrentBuffer()
   set scrollbind
 endfunction
 
+" Reset buffer sync for the current buffer
+function! s:ResetBufferSyncForCurrentBuffer()
+  if s:scratch_buffer_open
+    let &l:cursorbind = s:cursorbind_backup
+    let &l:scrollbind = s:scrollbind_backup
+  endif
+endfunction
+
 " Reset buffer sync in all the matching buffers
-function! s:ResetBufferSync()
+function! s:ResetBufferSyncForAllBuffers()
 
   " Loop through all the windows and reset the settings if required
   let l:currwin = winnr()
@@ -71,6 +87,8 @@ function! s:ResetBufferSync()
 
       let &l:cursorbind = s:cursorbind_backup
       let &l:scrollbind = s:scrollbind_backup
+
+      unlet w:import_cost_buffer_sync
     endif
   endfor
   execute l:currwin . 'wincmd w'
@@ -226,7 +244,7 @@ function! s:OnScriptFinish()
   " Create a new scratch buffer and fill it
   " Keep the focus on the currently opened buffer
   if l:imports_length > 0
-    let l:current_buffer_name = bufname('.')
+    let l:current_buffer_name = bufname('%')
     normal m'
 
     call s:CreateScratchBuffer()
@@ -244,7 +262,7 @@ function! s:OnScriptFinish()
 endfunction
 
 " }}}
-" Main functionality {{{
+" Async functionality {{{
 
 " Async job callback
 function! s:AsyncJobCallback(data, event)
@@ -273,6 +291,9 @@ function! s:ExecuteImportCostAsync(file_type, file_path, file_contents)
   call import_cost#async#job_close(s:import_cost_job_id)
 endfunction
 
+" }}}
+" Sync functionality {{{
+
 " Execute the script synchronously
 function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
 
@@ -293,6 +314,9 @@ function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
 
   call s:OnScriptFinish()
 endfunction
+
+" }}}
+" Main functionality {{{
 
 function! import_cost#ImportCost(ranged, line_1, line_2)
   let l:file_type = &filetype

@@ -1,5 +1,5 @@
 " This script contains some higher-level support for async operation in both
-" Neovim and Vim 8. Please nore that these implementations are *VERY* simple and
+" Neovim and Vim 8. Please note that these implementations are *VERY* simple and
 " targerting the use case of this specific plguin.
 
 " Most of following functions assumes that the check for async support
