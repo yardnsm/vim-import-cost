@@ -97,6 +97,15 @@ endfunction
 " }}}
 " Scratch buffer {{{
 
+" Setup mappings for the scratch buffer
+function! s:SetupScratchBufferMappings()
+  " Fast quitting
+  nnoremap <buffer> <silent> q :<C-U>bdelete<CR>
+
+  " Show total size
+  nnoremap <buffer> <silent> s :<C-U>echom b:total_size_string<CR>
+endfunction
+
 " Create a new empty scratch buffer, or focus on the currently opened one
 function! s:CreateScratchBuffer()
 
@@ -132,11 +141,8 @@ function! s:CreateScratchBuffer()
   setlocal nobuflisted
   setlocal nowrap
 
-  " Fast quitting
-  nnoremap <buffer> <silent> q :<C-U>bdelete<CR>
-
-  " Show total size
-  nnoremap <buffer> <silent> s :<C-U>echom b:total_size_string<CR>
+  " Setup mappings
+  call s:SetupScratchBufferMappings()
 endfunction
 
 " Fill the scratch buffer with imports
