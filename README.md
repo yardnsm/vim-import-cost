@@ -21,8 +21,8 @@ post](https://hackernoon.com/keep-your-bundle-size-under-control-with-import-cos
 
 ## Installation
 
-Use you favorite plugin manager to install this plugin. Make sure to have `node` (>= 8) and `npm`
-installed.
+Use your favorite plugin manager to install this plugin. Make sure to have `node` (>= 8) and `npm`
+both installed and available in your `$PATH`.
 
 ### Using [vim-plug](https://github.com/junegunn/vim-plug):
 
