@@ -154,7 +154,7 @@ function! s:FillScratchBuffer(imports, start_line, num_lines)
 
   " Appending the imports
   for import in a:imports
-    call append(import['line'] + a:start_line - 1, s:CreateImportString(import))
+    call append(import['line'] + a:start_line - 1, s:CreateImportString(import, 0))
   endfor
 
   " Clear extra blank lines
@@ -190,11 +190,15 @@ function! s:ParseSingleImport(key, val)
 endfunction
 
 " Create an import string from an import data
-function! s:CreateImportString(import)
+function! s:CreateImportString(import, mini)
   let l:raw_size = s:PrettyFormatSize(a:import['size'])
   let l:gzipped_size = s:PrettyFormatSize(a:import['gzip'])
 
-  let l:str = a:import['name'] . ': ' . l:raw_size
+  if a:mini
+    let l:str = l:raw_size
+  else
+    let l:str = a:import['name'] . ': ' . l:raw_size
+  endif
 
   if g:import_cost_show_gzipped == 1
     let l:str .= ' (gzipped: ' . l:gzipped_size . ')'
@@ -202,6 +206,7 @@ function! s:CreateImportString(import)
 
   return l:str
 endfunction
+
 
 " This function takes the imports data and returns a string containing data
 " about the total size
@@ -218,7 +223,22 @@ function! s:CreateTotalSizeString(imports)
         \ 'name': 'Total size',
         \ 'size': l:size,
         \ 'gzip': l:gzip,
-        \ })
+        \ }, 0)
+endfunction
+
+
+function! s:ShowVirtualTextMessage(imports, range_start_line, buffer_lines) abort
+  let l:hl_group =  get(g:, 'import_cost_virtualtext_hl_group', 'LineNr')
+  let l:prefix = get(g:, 'import_cost_virtualtext_prefix', ' > ')
+
+  let l:buffer = bufnr('')
+  call nvim_buf_clear_highlight(l:buffer, 1000, 0, -1)
+
+  for import in a:imports
+    let l:message = s:CreateImportString(import, 1)
+    let l:line = import['line'] + a:range_start_line - 1
+    call nvim_buf_set_virtual_text(l:buffer, 1000, l:line, [[l:prefix.l:message, l:hl_group]], {})
+  endfor
 endfunction
 
 function! s:OnScriptFinish()
@@ -243,25 +263,30 @@ function! s:OnScriptFinish()
   " If we've got a single import, echo it instead of creating a new scratch
   " buffer (if needed)
   if l:imports_length == 1 && g:import_cost_always_open_split != 1
-    echom s:CreateImportString(l:imports[0])
+    echom s:CreateImportString(l:imports[0], 0)
     return
   endif
 
   " Create a new scratch buffer and fill it
   " Keep the focus on the currently opened buffer
   if l:imports_length > 0
-    let l:current_buffer_name = bufname('%')
-    normal m'
+    if has('nvim-0.3.2')
+      call s:ShowVirtualTextMessage(l:imports, s:range_start_line, s:buffer_lines)
+    else
+      let l:current_buffer_name = bufname('%')
+      normal m'
 
-    call s:CreateScratchBuffer()
-    call s:FillScratchBuffer(l:imports, s:range_start_line, s:buffer_lines)
+      call s:CreateScratchBuffer()
+      call s:FillScratchBuffer(l:imports, s:range_start_line, s:buffer_lines)
 
-    " We'll keep the total size string within the scratch buffer
-    let b:total_size_string = s:CreateTotalSizeString(l:imports)
-    let l:result_message .= ' ' . b:total_size_string
+      " We'll keep the total size string within the scratch buffer
+      let b:total_size_string = s:CreateTotalSizeString(l:imports)
+      let l:result_message .= ' ' . b:total_size_string
 
-    execute bufwinnr(l:current_buffer_name) . 'wincmd w'
-    normal ''
+      execute bufwinnr(l:current_buffer_name) . 'wincmd w'
+      normal ''
+    endif
+
   endif
 
   echom l:result_message
