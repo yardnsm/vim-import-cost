@@ -45,6 +45,13 @@ call s:InitSettings(s:default_settings)
 function! s:InitCommands()
   command! -buffer -range=0 ImportCost call import_cost#ImportCost(<count>, <line1>, <line2>)
   command! -buffer          ImportCostSingle call import_cost#ImportCost(1, <line1>, <line1>)
+
+  augroup import_cost_auto_run
+    autocmd!
+    autocmd InsertLeave * call import_cost#ImportCost(0, 0 ,0)
+    autocmd BufEnter * call import_cost#ImportCost(0, 0 ,0)
+    autocmd CursorHold * call import_cost#ImportCost(0, 0 ,0)
+  augroup END
 endfunction
 
 " }}}

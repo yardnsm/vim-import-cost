@@ -245,7 +245,12 @@ function! s:OnScriptFinish()
 
   " Check for errors
   if len(s:import_cost_stderr)
-    call s:EchoError(s:import_cost_stderr)
+    if !has('nvim-0.3.2')
+      call s:EchoError(s:import_cost_stderr)
+    else
+      let l:buffer = bufnr('')
+      call nvim_buf_clear_highlight(l:buffer, 1000, 0, -1)
+    endif
     return
   endif
 
