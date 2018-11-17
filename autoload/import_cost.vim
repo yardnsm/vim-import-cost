@@ -42,7 +42,7 @@ function! s:EchoError(msg)
 endfunction
 
 " Check if virtualtext is supported
-function! s:IsVirtualTextSupported()
+function! import_cost#IsVirtualTextSupported()
     return has('nvim-0.3.2')
 endfunction
 
@@ -250,7 +250,7 @@ function! s:OnScriptFinish()
 
   " Check for errors
   if len(s:import_cost_stderr)
-    if !s:IsVirtualTextSupported()
+    if !import_cost#IsVirtualTextSupported()
       call s:EchoError(s:import_cost_stderr)
     else
       let l:buffer = bufnr('')
@@ -280,7 +280,7 @@ function! s:OnScriptFinish()
   " Create a new scratch buffer and fill it
   " Keep the focus on the currently opened buffer
   if l:imports_length > 0
-    if s:IsVirtualTextSupported()
+    if import_cost#IsVirtualTextSupported()
       call s:ShowVirtualTextMessage(l:imports, s:range_start_line, s:buffer_lines)
     else
       let l:current_buffer_name = bufname('%')

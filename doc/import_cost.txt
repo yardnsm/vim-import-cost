@@ -158,6 +158,44 @@ enabled by default. >
 Value: 0 or 1
 Default: 0 (use asynchronous execution)
 
+------------------------------------------------------------------------------
+g:import_cost_disable_virtualtext          *g:import_cost_disable_virtualtext*
+
+When this option is on, it will disable the use of virtualtext feature that
+will show the result to the right of the import and instead display the
+result in a split.
+
+If you are running a version without virtualtext, this option is assumed to be
+set to true.
+ >
+
+    let g:import_cost_disable_virtualtext = 1
+<
+Value: 0 or 1
+Default: 0 (use virtualtext insted of split)
+
+------------------------------------------------------------------------------
+g:import_cost_virtualtext_hl_group          *g:import_cost_virtualtext_hl_group*
+
+This options control what highlight group will be used to show the info.
+ >
+
+    let g:import_cost_virtualtext_hl_group = "LineNr"
+<
+Value: string
+Default: "LineNr"
+
+------------------------------------------------------------------------------
+g:import_cost_virtualtext_prefix          *g:import_cost_virtualtext_prefix*
+
+This options sets the prefix used to when displaying the import cost info.
+ >
+
+    let g:import_cost_virtualtext_hl_group = " :: "
+<
+Value: string
+Default: ">"
+
 ==============================================================================
 LICENSE                                                  *import-cost-license*
 
