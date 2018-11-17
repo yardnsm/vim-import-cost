@@ -41,6 +41,11 @@ function! s:EchoError(msg)
   echohl None
 endfunction
 
+" Check if virtualtext is supported
+function! s:IsVirtualTextSupported()
+    return has('nvim-0.3.2')
+endfunction
+
 " Pretty format a size in bytes
 function! s:PrettyFormatSize(size)
   let l:pretty_size = a:size / 1000.0
@@ -245,7 +250,7 @@ function! s:OnScriptFinish()
 
   " Check for errors
   if len(s:import_cost_stderr)
-    if !has('nvim-0.3.2')
+    if !s:IsVirtualTextSupported()
       call s:EchoError(s:import_cost_stderr)
     else
       let l:buffer = bufnr('')
@@ -275,7 +280,7 @@ function! s:OnScriptFinish()
   " Create a new scratch buffer and fill it
   " Keep the focus on the currently opened buffer
   if l:imports_length > 0
-    if has('nvim-0.3.2')
+    if s:IsVirtualTextSupported()
       call s:ShowVirtualTextMessage(l:imports, s:range_start_line, s:buffer_lines)
     else
       let l:current_buffer_name = bufname('%')
