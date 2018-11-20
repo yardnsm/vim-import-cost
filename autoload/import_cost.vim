@@ -299,7 +299,9 @@ function! s:OnScriptFinish()
 
   endif
 
-  echom l:result_message
+  if !g:import_cost_silent
+    echom l:result_message
+  endif
 endfunction
 
 " }}}

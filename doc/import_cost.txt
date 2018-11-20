@@ -196,6 +196,17 @@ This options sets the prefix used to when displaying the import cost info.
 Value: string
 Default: ">"
 
+------------------------------------------------------------------------------
+g:import_cost_silent                                    *g:import_cost_silent*
+
+This option will silence the output of import_cost if it is a successs.
+ >
+
+    let g:import_cost_silent = 1
+<
+Value: 0 or 1
+Default: 0
+
 ==============================================================================
 LICENSE                                                  *import-cost-license*
 

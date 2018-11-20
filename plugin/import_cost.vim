@@ -36,6 +36,7 @@ let s:default_settings = {
   \ 'split_pos': 'left',
   \ 'disable_async': 0,
   \ 'disable_auto': 0,
+  \ 'silent': 0,
   \ }
 
 call s:InitSettings(s:default_settings)
