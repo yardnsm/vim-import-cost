@@ -159,7 +159,7 @@ Value: 0 or 1
 Default: 0 (use asynchronous execution)
 
 ------------------------------------------------------------------------------
-g:import_cost_disable_virtualtext          *g:import_cost_disable_virtualtext*
+g:import_cost_virtualtext                          *g:import_cost_virtualtext*
 
 When this option is on, it will disable the use of virtualtext feature that
 will show the result to the right of the import and instead display the
@@ -169,10 +169,10 @@ If you are running a version without virtualtext, this option is assumed to be
 set to true.
  >
 
-    let g:import_cost_disable_virtualtext = 1
+    let g:import_cost_virtualtext = 0
 <
 Value: 0 or 1
-Default: 0 (use virtualtext insted of split)
+Default: 1 (use virtualtext insted of split if available)
 
 ------------------------------------------------------------------------------
 g:import_cost_virtualtext_hl_group          *g:import_cost_virtualtext_hl_group*
