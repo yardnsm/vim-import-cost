@@ -191,7 +191,7 @@ g:import_cost_virtualtext_prefix          *g:import_cost_virtualtext_prefix*
 This options sets the prefix used to when displaying the import cost info.
  >
 
-    let g:import_cost_virtualtext_hl_group = " :: "
+    let g:import_cost_virtualtext_prefix = " :: "
 <
 Value: string
 Default: ">"
