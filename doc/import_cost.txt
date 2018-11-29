@@ -166,7 +166,7 @@ will show the result to the right of the import and instead display the
 result in a split.
 
 If you are running a version without virtualtext, this option is assumed to be
-set to true.
+set to false.
  >
 
     let g:import_cost_virtualtext = 0
