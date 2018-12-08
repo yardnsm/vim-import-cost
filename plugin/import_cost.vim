@@ -35,6 +35,7 @@ let s:default_settings = {
   \ 'split_size': 50,
   \ 'split_pos': 'left',
   \ 'disable_async': 0,
+  \ 'virtualtext': 1,
   \ }
 
 call s:InitSettings(s:default_settings)
@@ -45,6 +46,15 @@ call s:InitSettings(s:default_settings)
 function! s:InitCommands()
   command! -buffer -range=0 ImportCost call import_cost#ImportCost(<count>, <line1>, <line2>)
   command! -buffer          ImportCostSingle call import_cost#ImportCost(1, <line1>, <line1>)
+
+  if import_cost#IsVirtualTextSupported() && g:import_cost_virtualtext && !g:import_cost_disable_async
+    augroup import_cost_auto_run
+      autocmd!
+      autocmd InsertLeave * call import_cost#ImportCost(0, 0 ,0)
+      autocmd BufEnter * call import_cost#ImportCost(0, 0 ,0)
+      autocmd CursorHold * call import_cost#ImportCost(0, 0 ,0)
+    augroup END
+  endif
 endfunction
 
 " }}}
