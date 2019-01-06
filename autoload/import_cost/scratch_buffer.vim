@@ -81,7 +81,7 @@ function! s:CreateTotalSizeString(imports)
         \ 'name': 'Total size',
         \ 'size': l:size,
         \ 'gzip': l:gzip,
-        \ }, 0)
+        \ }, 1)
 endfunction
 
 " }}}
@@ -175,7 +175,7 @@ function! s:FillScratchBuffer(imports, start_line, num_lines)
 
   " Appending the imports
   for import in a:imports
-    call append(import['line'] + a:start_line - 1, import_cost#utils#CreateImportString(import))
+    call append(import['line'] + a:start_line - 1, import_cost#utils#CreateImportString(import, 1))
   endfor
 
   " Clear extra blank lines
