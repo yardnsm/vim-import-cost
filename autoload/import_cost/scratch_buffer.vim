@@ -18,11 +18,10 @@ function! import_cost#scratch_buffer#Render(imports, start_line, num_lines)
   normal m'
 
   call s:CreateScratchBuffer()
-  call s:FillScratchBuffer(l:imports, s:range_start_line, s:buffer_lines)
+  call s:FillScratchBuffer(a:imports, a:start_line, a:num_lines)
 
   " We'll keep the total size string within the scratch buffer
-  let b:total_size_string = s:CreateTotalSizeString(l:imports)
-  let l:result_message .= ' ' . b:total_size_string
+  let b:total_size_string = s:CreateTotalSizeString(a:imports)
 
   execute bufwinnr(l:current_buffer_name) . 'wincmd w'
   normal ''
