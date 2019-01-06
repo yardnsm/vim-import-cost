@@ -190,7 +190,7 @@ function! import_cost#ImportCostClear(ranged, line_1, line_2)
   endif
 
   if a:ranged
-    call import_cost#virtual_text#ClearRange(a:line_1, a:line_2)
+    call import_cost#virtual_text#ClearRange(a:line_1 - 1, a:line_2)
   else
     call import_cost#virtual_text#Clear()
   endif
