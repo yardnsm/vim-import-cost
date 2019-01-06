@@ -36,7 +36,7 @@ function! s:SetVirtualText(imports, range_start_line, buffer_lines) abort
     let l:line = import['line'] + a:range_start_line - 1
 
     call nvim_buf_set_virtual_text(l:buffer,
-          \ s:virtual_text_namespace
+          \ s:virtual_text_namespace,
           \ l:line,
           \ [[ l:message, l:hl_group ]],
           \ {})
