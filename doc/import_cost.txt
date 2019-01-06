@@ -18,10 +18,11 @@ CONTENTS                                                *import-cost-contents*
     3. Commands............................. |import-cost-commands|
     4. Mappings............................. |import-cost-mappings|
     5. Configuration ....................... |import-cost-configuration|
-    6. License ............................. |import-cost-license|
-    7. Contributing ........................ |import-cost-contributing|
-    8. Credits ............................. |import-cost-credits|
-    9. Changelog ........................... |import-cost-changelog|
+    6. Highlights .......................... |import-cost-highlights|
+    7. License ............................. |import-cost-license|
+    8. Contributing ........................ |import-cost-contributing|
+    9. Credits ............................. |import-cost-credits|
+   10. Changelog ........................... |import-cost-changelog|
 
 ==============================================================================
 INTRO                                                            *import-cost*
@@ -188,18 +189,7 @@ Value: 0 or 1
 Default: 1 (use virtualtext)
 
 ------------------------------------------------------------------------------
-g:import_cost_virtualtext_hl_group        *g:import_cost_virtualtext_hl_group*
-
-This options controls what highlight group will be used when using the virtual
-text feature.
- >
-    let g:import_cost_virtualtext_hl_group = "LineNr"
-<
-Value: string
-Default: "LineNr"
-
-------------------------------------------------------------------------------
-g:import_cost_virtualtext_prefix          *g:import_cost_virtualtext_prefix*
+g:import_cost_virtualtext_prefix            *g:import_cost_virtualtext_prefix*
 
 This options sets the prefix used to when displaying the results when using
 the virtual text feature.
@@ -208,6 +198,16 @@ the virtual text feature.
 <
 Value: string
 Default: " > "
+
+==============================================================================
+HIGHLIGHTS                                            *import-cost-highlights*
+
+ImportCostVirtualText
+
+  Default: `highlight link ImportCostVirtualText LineNr`
+
+  The highlight used for the virtual text displayed by this plugin (only when
+  virtual text is supported).
 
 ==============================================================================
 LICENSE                                                  *import-cost-license*
