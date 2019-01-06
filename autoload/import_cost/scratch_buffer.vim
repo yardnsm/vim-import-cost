@@ -12,7 +12,7 @@ let s:autocmds_set = 0
 function! import_cost#scratch_buffer#Render(imports, start_line, num_lines)
 
   " Set autocmds
-  call s:SetAutocommands();
+  call s:SetAutocommands()
 
   let l:current_buffer_name = bufname('%')
   normal m'

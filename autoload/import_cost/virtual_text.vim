@@ -1,6 +1,12 @@
-let s:virtual_text_namespace = nvim_create_namespace('import_cost')
+let s:virtual_text_namespace = 0
+
 
 function! import_cost#virtual_text#Render(imports, start_line, num_lines)
+
+  " Create namespace
+  if !s:virtual_text_namespace
+    let s:virtual_text_namespace = nvim_create_namespace('import_cost')
+  endif
 
   " Clear!
   call import_cost#virtual_text#Clear()
