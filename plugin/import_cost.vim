@@ -36,6 +36,8 @@ let s:default_settings = {
   \ 'split_pos': 'left',
   \ 'disable_async': 0,
   \ 'virtualtext': 1,
+  \ 'virtualtext_hl_group': 'LineNr',
+  \ 'virtualtext_prefix': ' > ',
   \ }
 
 call s:InitSettings(s:default_settings)

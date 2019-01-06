@@ -28,11 +28,14 @@ INTRO                                                            *import-cost*
 
 This plugin is a (very rough) port of the "import-cost" plugin for Visual
 Studio Code. In a nutshell, it calculates the bundle size for each `import`
-or `require` statement. However, unlike the original plugin, this plugins does
-not show the calculated size as inline text. Instead, it exposes commands that
-allows you to calculate the package's size on demand.
+or `require` statement. Thanks to Neovim's virtual text feature, this plugin
+can show the calculated size next to the `import` statements, with a fallback
+to showing the calculated size in a scratch buffer.
 
-This plugin works for both JavaScript and TypeScript.
+This plugin exposes commands that allows you to calculate the package's size
+on demand.
+
+This plugin works for both JavaScript and TypeScript projects.
 
 ==============================================================================
 INSTALLATION                                             *import-cost-install*
@@ -61,12 +64,16 @@ COMMANDS                                                *import-cost-commands*
 ------------------------------------------------------------------------------
 :ImportCost                                                      *:ImportCost*
 
-Calculate the bundle size for each import in the opened buffer. If there are
-only 1 result, and |g:import_cost_always_open_split| is set to 0, the result
-will be shown below. Otherwise, a new split will be opened, containing the
-results for each import in the file.
+Calculate the bundle size for each import in the opened buffer. When using
+Neovim's virtual text feature to show the result, the results will be shown
+next to the `import` statements or the `require` calls.
 
-This command support line ranges.
+When using the scratch buffer, if there is only 1 result, and
+|g:import_cost_always_open_split| is set to 0, the result will be shown below.
+Otherwise, a new split will be opened, containing the results for each import
+in the file.
+
+This command support line ranges. By default it will act on the whole file.
 
 ------------------------------------------------------------------------------
 :ImportCostSingle                                          *:ImportCostSingle*
@@ -78,7 +85,8 @@ containing the result. Otherwise, the result will be shown below.
 ==============================================================================
 MAPPINGS                                                *import-cost-mappings*
 
-These mappings are available in the split showing the import sizes.
+These mappings are available in the split showing the import sizes (only when
+not using Neovim's virtual text feature).
 
 ------------------------------------------------------------------------------
 Show total import size                                *import-cost-total-size*
@@ -122,6 +130,8 @@ there is only one option: >
 Value: 0 or 1
 Default: 1 (always open a split)
 
+This option only applies when the scratch buffer is used.
+
 ------------------------------------------------------------------------------
 g:import_cost_split_size                            *g:import_cost_split_size*
 
@@ -133,6 +143,8 @@ This option controls the size of the output split. You can set this option to
 Value: number
 Default: 50
 
+This option only applies when the scratch buffer is used.
+
 ------------------------------------------------------------------------------
 g:import_cost_split_pos                              *g:import_cost_split_pos*
 
@@ -142,6 +154,8 @@ This option controls where to open output window: >
 <
 Value: "left", "right"
 Default: "left"
+
+This option only applies when the scratch buffer is used.
 
 ------------------------------------------------------------------------------
 g:import_cost_disable_async                      *g:import_cost_disable_async*
@@ -161,25 +175,24 @@ Default: 0 (use asynchronous execution)
 ------------------------------------------------------------------------------
 g:import_cost_virtualtext                          *g:import_cost_virtualtext*
 
-When this option is on, it will disable the use of virtualtext feature that
-will show the result to the right of the import and instead display the
-result in a split.
+When this option is on, this plugin will use Neovim's virtual text feature to
+show the results next to the `import` statements and the `require` calls,
+instead of opening the scratch buffer in a split.
 
 If you are running a version without virtualtext, this option is assumed to be
 set to false.
  >
-
     let g:import_cost_virtualtext = 0
 <
 Value: 0 or 1
-Default: 1 (use virtualtext insted of split if available)
+Default: 1 (use virtualtext)
 
 ------------------------------------------------------------------------------
-g:import_cost_virtualtext_hl_group          *g:import_cost_virtualtext_hl_group*
+g:import_cost_virtualtext_hl_group        *g:import_cost_virtualtext_hl_group*
 
-This options control what highlight group will be used to show the info.
+This options controls what highlight group will be used when using the virtual
+text feature.
  >
-
     let g:import_cost_virtualtext_hl_group = "LineNr"
 <
 Value: string
@@ -188,13 +201,13 @@ Default: "LineNr"
 ------------------------------------------------------------------------------
 g:import_cost_virtualtext_prefix          *g:import_cost_virtualtext_prefix*
 
-This options sets the prefix used to when displaying the import cost info.
+This options sets the prefix used to when displaying the results when using
+the virtual text feature.
  >
-
-    let g:import_cost_virtualtext_prefix = " :: "
+    let g:import_cost_virtualtext_prefix = " > "
 <
 Value: string
-Default: ">"
+Default: " > "
 
 ==============================================================================
 LICENSE                                                  *import-cost-license*
