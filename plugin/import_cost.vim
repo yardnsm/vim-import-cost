@@ -50,6 +50,8 @@ highlight default link ImportCostVirtualText LineNr
 function! s:InitCommands()
   command! -buffer -range=0 ImportCost call import_cost#ImportCost(<count>, <line1>, <line2>)
   command! -buffer          ImportCostSingle call import_cost#ImportCost(1, <line1>, <line1>)
+
+  command! -buffer -range=0 ImportCost call import_cost#ImportCostClear(<count>, <line1>, <line2>)
 endfunction
 
 " }}}

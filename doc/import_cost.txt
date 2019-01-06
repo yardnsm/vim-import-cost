@@ -83,6 +83,12 @@ Calculate the bundle size for the current line only. If
 |g:import_cost_always_open_split| is set to 1, a new split will be opened,
 containing the result. Otherwise, the result will be shown below.
 
+------------------------------------------------------------------------------
+:ImportCostClear                                            *:ImportCostClear*
+
+If Nvim's virtual text feature is being used, running this command will clear
+the virtual text that has been set by this plugin.
+
 ==============================================================================
 MAPPINGS                                                *import-cost-mappings*
 

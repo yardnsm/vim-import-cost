@@ -55,14 +55,14 @@ endfunction
 
 function! s:OnScriptFinish()
 
+  " Clear if needed
+  if s:GetRendererName() ==# 'virtual_text'
+    call import_cost#virtual_text#Clear()
+  endif
+
   " Check for errors
   if len(s:import_cost_stderr)
     call s:EchoError(s:import_cost_stderr)
-
-    if s:GetRendererName() ==# 'virtual_text'
-      call import_cost#virtual_text#Clear()
-    endif
-
     return
   endif
 
@@ -181,6 +181,18 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
     call s:ExecuteImportCostAsync(l:file_type, l:file_path, l:buffer_content)
   else
     call s:ExecuteImportCostSync(l:file_type, l:file_path, l:buffer_content)
+  endif
+endfunction
+
+function! import_cost#ImportCostClear(ranged, line_1, line_2)
+  if s:GetRendererName() !=# 'virtual_text'
+    return
+  endif
+
+  if a:ranged
+    call import_cost#virtual_text#ClearRange(a:line_1 - 1, a:line_2 - 1)
+  else
+    call import_cost#virtual_text#Clear()
   endif
 endfunction
 

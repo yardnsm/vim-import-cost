@@ -11,8 +11,16 @@ endfunction
 
 " Clear the virtual text
 function! import_cost#virtual_text#Clear()
+  call import_cost#virtual_text#ClearRange(0, -1)
+endfunction
+
+" Clear the virtual text in a arange
+function! import_cost#virtual_text#ClearRange(line_1, line_2)
   let l:buffer = bufnr('')
-  call nvim_buf_clear_namespace(l:buffer, s:virtual_text_namespace, 0, -1)
+  call nvim_buf_clear_namespace(l:buffer,
+        \ s:virtual_text_namespace,
+        \ a:line_1,
+        \ a:line_2)
 endfunction
 
 " Feature support {{{
