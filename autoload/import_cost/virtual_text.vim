@@ -10,7 +10,7 @@ function! import_cost#virtual_text#Render(imports, start_line, num_lines)
 endfunction
 
 " Clear the virtual text
-function! import_cost#virtual_text#Clear(imports, start_line, num_lines)
+function! import_cost#virtual_text#Clear()
   let l:buffer = bufnr('')
   call nvim_buf_clear_namespace(l:buffer, s:virtual_text_namespace, 0, -1)
 endfunction
