@@ -29,9 +29,9 @@ INTRO                                                            *import-cost*
 
 This plugin is a (very rough) port of the "import-cost" plugin for Visual
 Studio Code. In a nutshell, it calculates the bundle size for each `import`
-or `require` statement. Thanks to Neovim's virtual text feature, this plugin
-can show the calculated size next to the `import` statements, with a fallback
-to showing the calculated size in a scratch buffer.
+statement or `require` calls. Thanks to Neovim's virtual text feature, this
+plugin can show the calculated size next to the `import` statements, with a
+fallback to showing the calculated size in a scratch buffer.
 
 This plugin exposes commands that allows you to calculate the package's size
 on demand.
@@ -210,7 +210,7 @@ HIGHLIGHTS                                            *import-cost-highlights*
 
 ImportCostVirtualText
 
-  Default: `highlight link ImportCostVirtualText LineNr`
+  Default: `highlight link ImportCostVirtualText NonText`
 
   The highlight used for the virtual text displayed by this plugin (only when
   virtual text is supported).

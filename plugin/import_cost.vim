@@ -42,7 +42,7 @@ let s:default_settings = {
 call s:InitSettings(s:default_settings)
 
 " Setting highlights
-highlight default link ImportCostVirtualText LineNr
+highlight default link ImportCostVirtualText NonText
 
 " }}}
 " Commands {{{
