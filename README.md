@@ -6,8 +6,8 @@
 
 This plugin is a (very rough) port of the [import-cost](https://github.com/wix/import-cost) plugin
 for Visual Studio Code. In a nutshell, it calculates the bundle size for each `import` statement or
-`require` calls statement. Thanks to Neovim's virtual text feature, this plugin can show the
-calculated size next to the `import` statements, with a fallback to showing the calculated size in a
+`require` calls. Thanks to Neovim's virtual text feature, this plugin can show the calculated size
+next to the `import` statements, with a fallback to showing the calculated size in a
 scratch buffer.
 
 This plugin exposes commands that allows you to calculate the package's size on demand. By default
