@@ -15,7 +15,7 @@ it'll try to use Neovim's virtual text feature.
 
 This plugin uses the
 [`import-cost`](https://github.com/wix/import-cost/tree/master/packages/import-cost) module (also
-part of the origin import-cost plugin) that uses `webpack` to calculate the size of the imported
+part of the original import-cost plugin) that uses `webpack` to calculate the size of the imported
 module.
 
 You can find more information about how the size calculation process works in [this blog
@@ -68,7 +68,6 @@ augroup import_cost_auto_run
   autocmd CursorHold *.js,*.jsx,*.ts,*.tsx ImportCost
 augroup END
 ```
-
 
 ---
 
