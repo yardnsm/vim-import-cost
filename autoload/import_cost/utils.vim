@@ -15,6 +15,10 @@ endfunction
 
 " Create an import string from an import data
 function! import_cost#utils#CreateImportString(import, show_name)
+  if a:import['size'] == -1
+    return 'Calculating...'
+  endif
+
   let l:raw_size = import_cost#utils#PrettyFormatSize(a:import['size'])
   let l:gzipped_size = import_cost#utils#PrettyFormatSize(a:import['gzip'])
 

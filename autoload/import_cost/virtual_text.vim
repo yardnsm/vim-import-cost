@@ -1,18 +1,14 @@
 let s:virtual_text_namespace = 0
 
-
-function! import_cost#virtual_text#Render(imports, start_line, num_lines)
+function! import_cost#virtual_text#Render(imports, range_start_line, buffer_lines)
 
   " Create namespace
   if !s:virtual_text_namespace
     let s:virtual_text_namespace = nvim_create_namespace('import_cost')
   endif
 
-  " Clear!
-  call import_cost#virtual_text#Clear()
-
   " Render it!
-  call s:SetVirtualText(a:imports, a:start_line, a:num_lines)
+  call s:SetVirtualText(a:imports, a:range_start_line, a:buffer_lines)
 endfunction
 
 " Clear the virtual text
@@ -39,7 +35,7 @@ endfunction
 " }}}
 " Virtual text {{{
 
-function! s:SetVirtualText(imports, range_start_line, buffer_lines) abort
+function! s:SetVirtualText(imports, range_range_start_line, buffer_lines) abort
   let l:hl_group = 'ImportCostVirtualText'
   let l:prefix = g:import_cost_virtualtext_prefix
 
@@ -47,7 +43,7 @@ function! s:SetVirtualText(imports, range_start_line, buffer_lines) abort
 
   for import in a:imports
     let l:message = l:prefix . import_cost#utils#CreateImportString(import, 0)
-    let l:line = import['line'] + a:range_start_line - 1
+    let l:line = import['line'] + a:range_range_start_line - 1
 
     call nvim_buf_set_virtual_text(l:buffer,
           \ s:virtual_text_namespace,

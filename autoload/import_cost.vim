@@ -1,10 +1,6 @@
 let s:plug = expand("<sfile>:p:h:h")
 let s:script_path = s:plug . '/src/index.js'
 
-" Outputs of the import cost script
-let s:import_cost_stdout = ''
-let s:import_cost_stderr = ''
-
 " Current running async job
 let s:import_cost_job_id = 0
 
@@ -30,71 +26,75 @@ function! s:GetRendererName()
 endfunction
 
 " }}}
-" Imports parsing {{{
+" Events handling {{{
 
-" Parse a single import
-function! s:ParseSingleImport(key, val)
-  let l:parts = split(a:val, ',')
+function! s:OnEvent(type, payload)
 
-  if len(l:parts) != 4
-    return ''
-  endif
-
-  let l:name = l:parts[0]
-  let l:line = l:parts[1]
-  let l:size = l:parts[2]
-  let l:gzip = l:parts[3]
-
-  return {
-    \ 'name': l:name,
-    \ 'line': l:line,
-    \ 'size': l:size,
-    \ 'gzip': l:gzip,
-    \ }
-endfunction
-
-function! s:OnScriptFinish()
-
-  " Clear if needed
-  if s:GetRendererName() ==# 'virtual_text'
-    call import_cost#virtual_text#Clear()
-  endif
-
-  " Check for errors
-  if len(s:import_cost_stderr)
-    call s:EchoError(s:import_cost_stderr)
-    return
-  endif
-
-  " If we got nothing, do nothing
-  if !len(s:import_cost_stdout)
-    return
-  endif
-
-  let l:imports = map(split(s:import_cost_stdout, '\n'), function('s:ParseSingleImport'))
-  call filter(l:imports, 'len(v:val)')
-
-  let l:imports_length = len(l:imports)
-  let l:result_message = 'Got ' . l:imports_length . ' results.'
-
-  " If we've got a single import, echo it instead of creating a new scratch
-  " buffer (if needed)
-  if l:imports_length == 1 && g:import_cost_always_open_split != 1
-    echom import_cost#utils#CreateImportString(l:imports[0], 1)
-    return
-  endif
-
-  if l:imports_length > 0
-
+  " Got an error
+  if a:type ==# 'error'
     if s:GetRendererName() ==# 'virtual_text'
+      call import_cost#virtual_text#Clear()
+    endif
 
-      " Use the virtual_text renderer
+    call s:EchoError(a:payload)
+    return
+  endif
+
+  " Got a list of imports, no sizes yet. Just show a message next to each import.
+  " Only for the virtual_text renderer
+  if a:type ==# 'start'
+    if s:GetRendererName() ==# 'virtual_text'
+      let l:imports = a:payload
+
+      " Clear previous virtualtext and set imports
+      call import_cost#virtual_text#Clear()
       call import_cost#virtual_text#Render(l:imports, s:range_start_line, s:buffer_lines)
-    else
+    endif
 
-      " Use a scratch buffer and echo the result message
-      call import_cost#scratch_buffer#Render(l:imports, s:range_start_line, s:buffer_lines)
-      echom l:result_message
+    return
+  endif
+
+  " Got a single import data
+  " Only for the virtual_text renderer
+  if a:type ==# 'calculated'
+    if s:GetRendererName() ==# 'virtual_text'
+      let l:imports = a:payload
+
+      " Set new import
+      call import_cost#virtual_text#Render(l:imports, s:range_start_line, s:buffer_lines)
+    endif
+
+    return
+  endif
+
+  " Got all imports
+  if a:type ==# 'done'
+
+    let l:imports = a:payload
+
+    let l:imports_length = len(l:imports)
+    let l:result_message = 'Got ' . l:imports_length . ' results.'
+
+    if l:imports_length > 0
+
+      if s:GetRendererName() ==# 'virtual_text'
+
+        " Use the virtual_text renderer
+        call import_cost#virtual_text#Clear()
+        call import_cost#virtual_text#Render(l:imports, s:range_start_line, s:buffer_lines)
+      else
+
+        " If we've got a single import, echo it instead of creating a new scratch
+        " buffer (if needed)
+        if l:imports_length == 1 && g:import_cost_always_open_split != 1
+          echom import_cost#utils#CreateImportString(l:imports[0], 1)
+        else
+
+          " Use a scratch buffer and echo the result message
+          call import_cost#scratch_buffer#Render(l:imports, s:range_start_line, s:buffer_lines)
+          echom l:result_message
+        endif
+      endif
     endif
   endif
 endfunction
@@ -105,11 +105,8 @@ endfunction
 " Async job callback
 function! s:AsyncJobCallback(data, event)
   if a:event ==# 'stdout'
-    let s:import_cost_stdout .= a:data
-  elseif a:event ==# 'stderr' && a:data =~# '\v^\[error\]'
-    let s:import_cost_stderr .= a:data
-  elseif a:event ==# 'exit'
-    call s:OnScriptFinish()
+    let l:json = json_decode(a:data)
+    call s:OnEvent(l:json['type'], l:json['payload'])
   endif
 endfunction
 
@@ -137,20 +134,15 @@ function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
 
   echo 'Calculating... (press ^C to terminate)'
 
-  let l:command = join(['node', s:script_path, a:file_type, a:file_path], ' ')
+  let l:command = join(['node', s:script_path, a:file_type, a:file_path, 'sync'], ' ')
   let l:result = system(l:command, a:file_contents)
 
-  " Check for errors
-  if l:result =~ '\v^\[error\]'
-    let s:import_cost_stderr = l:result
-  else
-    let s:import_cost_stdout = l:result
-  endif
+  let l:json = json_decode(split(l:result, "\n")[-1])
 
   " Clear last message
   redraw
 
-  call s:OnScriptFinish()
+  call s:OnEvent(l:json['type'], l:json['payload'])
 endfunction
 
 " }}}

@@ -9,7 +9,7 @@ let s:scratch_buffer_open = 0
 
 let s:autocmds_set = 0
 
-function! import_cost#scratch_buffer#Render(imports, start_line, num_lines)
+function! import_cost#scratch_buffer#Render(imports, range_start_line, buffer_lines)
 
   " Set autocmds
   call s:SetAutocommands()
@@ -18,7 +18,7 @@ function! import_cost#scratch_buffer#Render(imports, start_line, num_lines)
   normal m'
 
   call s:CreateScratchBuffer()
-  call s:FillScratchBuffer(a:imports, a:start_line, a:num_lines)
+  call s:FillScratchBuffer(a:imports, a:range_start_line, a:buffer_lines)
 
   " We'll keep the total size string within the scratch buffer
   let b:total_size_string = s:CreateTotalSizeString(a:imports)
@@ -168,14 +168,14 @@ endfunction
 
 " Fill the scratch buffer with imports
 " Asumming we're in the scratch buffer...
-function! s:FillScratchBuffer(imports, start_line, num_lines)
+function! s:FillScratchBuffer(imports, range_start_line, buffer_lines)
 
   " Appending empty lines to the buffer
-  call append(0, map(range(a:num_lines), '""'))
+  call append(0, map(range(a:buffer_lines), '""'))
 
   " Appending the imports
   for import in a:imports
-    call append(import['line'] + a:start_line - 1, import_cost#utils#CreateImportString(import, 1))
+    call append(import['line'] + a:range_start_line - 1, import_cost#utils#CreateImportString(import, 1))
   endfor
 
   " Clear extra blank lines

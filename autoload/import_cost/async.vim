@@ -10,6 +10,14 @@ function! import_cost#async#is_supported()
   return has('nvim') || v:version >= 800
 endfunction
 
+function! s:SplitData(data, event, callback)
+  let l:data_list = split(a:data, "\n")
+
+  for d in l:data_list
+    call a:callback(d, a:event)
+  endfor
+endfunction
+
 " Starts a new async job and returns the job id
 " The callback function should have the following signature:
 "
@@ -25,7 +33,7 @@ function! import_cost#async#job_start(command, callback)
     " 'Converting' neovim's callback function to our 'basic' callback
     " signature
     let l:TransformedCallback = {job_id, data, event ->
-          \ a:callback(type(data) == 3 ? join(data, "\n") : data, event)}
+          \ s:SplitData(type(data) == 3 ? join(data, "\n") : data, event, a:callback)}
 
     let l:job_id = jobstart(a:command, {
           \ 'shell': 'import_cost_shell',
@@ -35,9 +43,9 @@ function! import_cost#async#job_start(command, callback)
           \ })
   else
     let l:job_id = job_start(a:command, {
-          \ 'callback': {channel, data -> a:callback(data, 'stdout')},
-          \ 'err_cb': {channel, data -> a:callback(data, 'stderr')},
-          \ 'exit_cb': {job_id, exit_code -> a:callback(exit_code, 'exit')},
+          \ 'callback': {channel, data -> s:SplitData(data, 'stdout', a:callback)},
+          \ 'err_cb': {channel, data -> s:SplitData(data, 'stderr', a:callback)},
+          \ 'exit_cb': {job_id, exit_code -> s:SplitData(exit_code, 'exit', a:callback)},
           \ 'mode': 'raw',
           \ })
   endif
