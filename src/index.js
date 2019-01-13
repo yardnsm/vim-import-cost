@@ -4,18 +4,17 @@ const {
 } = require('import-cost');
 
 const write = payload => process.nextTick(() => {
-  process.stdout.write(JSON.stringify(payload) + '\n');
+  process.stdout.write(`${JSON.stringify(payload)}\n`);
 });
 
-const extractPackage = package => ({
-  name: package.name,
-  line: package.line,
-  size: typeof package.size === 'undefined' ? -1 : package.size,
-  gzip: typeof package.gzip === 'undefined' ? -1 : package.gzip,
+const extractPackage = pkg => ({
+  name: pkg.name,
+  line: pkg.line,
+  size: typeof pkg.size === 'undefined' ? -1 : pkg.size,
+  gzip: typeof pkg.gzip === 'undefined' ? -1 : pkg.gzip,
 });
 
 async function start() {
-
   // Arguments
   const fileType = process.argv[2].includes('typescript') ? TYPESCRIPT : JAVASCRIPT;
   const filePath = process.argv[3];
@@ -48,14 +47,14 @@ async function start() {
     });
   });
 
-  emitter.on('calculated', (package) => {
+  emitter.on('calculated', (pkg) => {
     if (isSync) {
       return;
     }
 
     write({
       type: 'calculated',
-      payload: [extractPackage(package)],
+      payload: [extractPackage(pkg)],
     });
   });
 
@@ -76,7 +75,9 @@ async function start() {
   });
 }
 
+// Wrapping it in try/catch to prevent errors to go to stderr
 try {
   start();
 } catch (e) {
+  // empty
 }
