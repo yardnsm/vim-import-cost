@@ -134,9 +134,10 @@ function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
 
   echo 'Calculating... (press ^C to terminate)'
 
-  let l:command = join(['node', s:script_path, a:file_type, a:file_path, 'sync'], ' ')
+  let l:command = join(['node', s:script_path, a:file_type, a:file_path], ' ')
   let l:result = system(l:command, a:file_contents)
 
+  " We'll only care for the last result
   let l:json = json_decode(split(l:result, "\n")[-1])
 
   " Clear last message

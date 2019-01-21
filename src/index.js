@@ -19,28 +19,12 @@ async function start() {
   const fileType = process.argv[2].includes('typescript') ? TYPESCRIPT : JAVASCRIPT;
   const filePath = process.argv[3];
 
-  /*
-   * This script can be executed in 2 modes:
-   *
-   *  - In async mode, when this script will write the events as JSON to stdout as they'll arrive.
-   *    This mode can be used to update the editor on the fly, rather than waiting for the entire
-   *    process to complete. This is the default mode.
-   *
-   *  - In sync mode, when this script only write the final result as JSON when this script
-   *    finishes.
-   */
-  const isSync = process.argv[4] === 'sync';
-
   // File contents through stdin
   const fileContents = await getStdin();
 
   const emitter = importCost(filePath, fileContents, fileType);
 
   emitter.on('start', (packages) => {
-    if (isSync) {
-      return;
-    }
-
     write({
       type: 'start',
       payload: packages.map(extractPackage),
@@ -48,10 +32,6 @@ async function start() {
   });
 
   emitter.on('calculated', (pkg) => {
-    if (isSync) {
-      return;
-    }
-
     write({
       type: 'calculated',
       payload: [extractPackage(pkg)],
