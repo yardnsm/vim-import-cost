@@ -64,6 +64,7 @@ augroup import_cost_au
   autocmd FileType javascript.jsx  call <SID>InitCommands()
   autocmd FileType typescript      call <SID>InitCommands()
   autocmd FileType typescript.jsx  call <SID>InitCommands()
+  autocmd FileType typescript.tsx  call <SID>InitCommands()
   autocmd FileType typescriptreact call <SID>InitCommands()
 augroup END
 
