@@ -36,7 +36,9 @@ function! s:OnEvent(type, payload)
       call import_cost#virtual_text#Clear()
     endif
 
-    call s:EchoError(a:payload)
+    if !g:import_cost_silent
+      call s:EchoError(a:payload)
+    endif
     return
   endif
 

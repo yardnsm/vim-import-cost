@@ -37,6 +37,7 @@ let s:default_settings = {
   \ 'disable_async': 0,
   \ 'virtualtext': 1,
   \ 'virtualtext_prefix': ' > ',
+  \ 'silent': 0,
   \ }
 
 call s:InitSettings(s:default_settings)
