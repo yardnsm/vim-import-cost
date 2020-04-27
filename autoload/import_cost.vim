@@ -28,12 +28,12 @@ endfunction
 " }}}
 " Events handling {{{
 
-function! s:OnEvent(type, payload)
+function! s:OnEvent(buffer, type, payload)
 
   " Got an error
   if a:type ==# 'error'
     if s:GetRendererName() ==# 'virtual_text'
-      call import_cost#virtual_text#Clear()
+      call import_cost#virtual_text#Clear(a:buffer)
     endif
 
     call s:EchoError(a:payload)
@@ -47,8 +47,8 @@ function! s:OnEvent(type, payload)
       let l:imports = a:payload
 
       " Clear previous virtualtext and set imports
-      call import_cost#virtual_text#Clear()
-      call import_cost#virtual_text#Render(l:imports, s:range_start_line, s:buffer_lines)
+      call import_cost#virtual_text#Clear(a:buffer)
+      call import_cost#virtual_text#Render(a:buffer, l:imports, s:range_start_line, s:buffer_lines)
     endif
 
     return
@@ -61,7 +61,7 @@ function! s:OnEvent(type, payload)
       let l:imports = a:payload
 
       " Set new import
-      call import_cost#virtual_text#Render(l:imports, s:range_start_line, s:buffer_lines)
+      call import_cost#virtual_text#Render(a:buffer, l:imports, s:range_start_line, s:buffer_lines)
     endif
 
     return
@@ -80,8 +80,8 @@ function! s:OnEvent(type, payload)
       if s:GetRendererName() ==# 'virtual_text'
 
         " Use the virtual_text renderer
-        call import_cost#virtual_text#Clear()
-        call import_cost#virtual_text#Render(l:imports, s:range_start_line, s:buffer_lines)
+        call import_cost#virtual_text#Clear(a:buffer)
+        call import_cost#virtual_text#Render(a:buffer, l:imports, s:range_start_line, s:buffer_lines)
       else
 
         " If we've got a single import, echo it instead of creating a new scratch
@@ -91,7 +91,7 @@ function! s:OnEvent(type, payload)
         else
 
           " Use a scratch buffer and echo the result message
-          call import_cost#scratch_buffer#Render(l:imports, s:range_start_line, s:buffer_lines)
+          call import_cost#scratch_buffer#Render(a:buffer, l:imports, s:range_start_line, s:buffer_lines)
           echom l:result_message
         endif
       endif
@@ -102,17 +102,19 @@ endfunction
 " }}}
 " Async functionality {{{
 
-" Async job callback
-function! s:AsyncJobCallback(data, event)
-  if a:event ==# 'stdout'
-    let l:json = json_decode(a:data)
-    call s:OnEvent(l:json['type'], l:json['payload'])
-  endif
-endfunction
-
 " Execute the script asynchronously
 function! s:ExecuteImportCostAsync(file_type, file_path, file_contents)
   let l:command = ['node', s:script_path, a:file_type, a:file_path]
+  let l:buffer = bufnr('')
+
+  " Async job callback
+  function! s:AsyncJobCallback(data, event) closure
+    if a:event ==# 'stdout'
+      let l:json = json_decode(a:data)
+      call s:OnEvent(l:buffer, l:json['type'], l:json['payload'])
+    endif
+  endfunction
+
 
   " Kill last job
   silent! call import_cost#async#job_stop(s:import_cost_job_id)
@@ -131,6 +133,7 @@ endfunction
 
 " Execute the script synchronously
 function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
+  let buffer = bufnr('')
 
   echo 'Calculating... (press ^C to terminate)'
 
@@ -143,7 +146,7 @@ function! s:ExecuteImportCostSync(file_type, file_path, file_contents)
   " Clear last message
   redraw
 
-  call s:OnEvent(l:json['type'], l:json['payload'])
+  call s:OnEvent(l:buffer, l:json['type'], l:json['payload'])
 endfunction
 
 " }}}
@@ -178,14 +181,15 @@ function! import_cost#ImportCost(ranged, line_1, line_2)
 endfunction
 
 function! import_cost#ImportCostClear(ranged, line_1, line_2)
+  let buffer = bufnr('')
   if s:GetRendererName() !=# 'virtual_text'
     return
   endif
 
   if a:ranged
-    call import_cost#virtual_text#ClearRange(a:line_1 - 1, a:line_2)
+    call import_cost#virtual_text#ClearRange(a:buffer, a:line_1 - 1, a:line_2)
   else
-    call import_cost#virtual_text#Clear()
+    call import_cost#virtual_text#Clear(a:buffer)
   endif
 endfunction
 
