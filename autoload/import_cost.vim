@@ -11,6 +11,10 @@ let s:range_start_line = 0
 
 " Echo an error message
 function! s:EchoError(msg)
+  if g:import_cost_silent
+    return
+  endif
+
   echohl Error
   echom 'vim-import-cost: ' . a:msg
   echohl None
@@ -36,9 +40,7 @@ function! s:OnEvent(type, payload)
       call import_cost#virtual_text#Clear()
     endif
 
-    if !g:import_cost_silent
-      call s:EchoError(a:payload)
-    endif
+    call s:EchoError(a:payload)
     return
   endif
 
