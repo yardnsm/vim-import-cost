@@ -11,6 +11,10 @@ let s:range_start_line = 0
 
 " Echo an error message
 function! s:EchoError(msg)
+  if g:import_cost_silent
+    return
+  endif
+
   echohl Error
   echom 'vim-import-cost: ' . a:msg
   echohl None

@@ -205,6 +205,17 @@ the virtual text feature.
 Value: string
 Default: " > "
 
+------------------------------------------------------------------------------
+g:import_cost_slient                                    *g:import_cost_silent*
+
+When this option is on, the plugin does not echo error messages.
+ >
+    let g:import_cost_silent = 1
+<
+Value: 0 or 1
+Default: 0
+
+
 ==============================================================================
 HIGHLIGHTS                                            *import-cost-highlights*
 
