@@ -95,7 +95,7 @@ function! s:OnEvent(buffer, type, payload)
         else
 
           " Use a scratch buffer and echo the result message
-          call import_cost#scratch_buffer#Render(a:buffer, l:imports, s:range_start_line, s:buffer_lines)
+          call import_cost#scratch_buffer#Render(l:imports, s:range_start_line, s:buffer_lines)
           echom l:result_message
         endif
       endif
