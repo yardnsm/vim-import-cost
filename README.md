@@ -29,7 +29,7 @@ both installed and available in your `$PATH`.
 ### Using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'yardnsm/vim-import-cost', { 'do': 'npm install' }
+Plug 'yardnsm/vim-import-cost', { 'do': 'npm install --production' }
 ```
 
 If you're installing the plugin in different way, make sure to run `npm install` in the root path of
